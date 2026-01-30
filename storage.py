@@ -4,16 +4,27 @@ from psycopg2 import extras
 import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
-# Vercel Environment Variables se URL fetch karein
-# os.environ.get use karna zyada safe hai deployment ke waqt
-DATABASE_URL = os.environ.get('POSTGRES_URL')
+def get_db_url():
+    """Vercel Postgres URL ko clean aur format karne ke liye helper."""
+    url = os.environ.get('POSTGRES_URL') or os.environ.get('DATABASE_URL')
+    
+    if not url:
+        return None
+        
+    # Fix 1: psycopg2 'postgresql://' mangta hai, 'postgres://' nahi
+    if url.startswith("postgres://"):
+        url = url.replace("postgres://", "postgresql://", 1)
+    
+    # Fix 2: Supabase ya extra params jo error dete hain unhe hatao
+    # Hum sirf base URL use karenge aur sslmode manually add karenge
+    base_url = url.split("?")[0]
+    return f"{base_url}?sslmode=require"
 
 def get_connection():
-    if not DATABASE_URL:
-        raise ValueError("POSTGRES_URL is missing! Please connect Vercel Storage to your project.")
-    
-    # SSL mode 'require' cloud DBs ke liye mandatory hai
-    return psycopg2.connect(DATABASE_URL, sslmode='require')
+    url = get_db_url()
+    if not url:
+        raise ValueError("Database URL missing! Dashboard se Postgres connect karein.")
+    return psycopg2.connect(url)
 
 def init_db():
     con = None
@@ -84,6 +95,9 @@ def verify_login(email, password):
         if row and check_password_hash(row[1], password):
             return row[0]
         return None
+    except Exception as e:
+        print(f"Login Error: {e}")
+        return None
     finally:
         if con:
             con.close()
@@ -96,6 +110,8 @@ def user_exists(username):
         cur.execute("SELECT 1 FROM users WHERE username=%s", (username,))
         exists = cur.fetchone() is not None
         return exists
+    except:
+        return False
     finally:
         if con:
             con.close()
@@ -111,6 +127,8 @@ def store_message(sender, receiver, msg):
             VALUES (%s, %s, %s, %s)
         """, (sender, receiver, msg, datetime.datetime.now()))
         con.commit()
+    except Exception as e:
+        print(f"Store Message Error: {e}")
     finally:
         if con:
             con.close()
@@ -133,6 +151,9 @@ def get_messages_between(u1, u2):
         rows = cur.fetchall()
         con.commit()
         return [{"from": r['sender'], "to": r['receiver'], "msg": r['msg'], "time": r['timestamp']} for r in rows]
+    except Exception as e:
+        print(f"Fetch Messages Error: {e}")
+        return []
     finally:
         if con:
             con.close()
@@ -145,6 +166,8 @@ def get_unread_count(user, other):
         cur.execute("SELECT COUNT(*) FROM messages WHERE sender=%s AND receiver=%s AND is_read=0", (other, user))
         count = cur.fetchone()[0]
         return count
+    except:
+        return 0
     finally:
         if con:
             con.close()
@@ -164,6 +187,8 @@ def get_conversations(username):
         """, (username, username))
         users = [row[0] for row in cur.fetchall()]
         return users
+    except:
+        return []
     finally:
         if con:
             con.close()
@@ -180,6 +205,8 @@ def get_last_message(u1, u2):
         """, (u1, u2, u2, u1))
         row = cur.fetchone()
         return {"msg": row[0], "time": row[1]} if row else None
+    except:
+        return None
     finally:
         if con:
             con.close()
@@ -216,6 +243,8 @@ def is_blocked(blocker, blocked):
         cur.execute("SELECT 1 FROM blocks WHERE blocker=%s AND blocked=%s", (blocker, blocked))
         result = cur.fetchone() is not None
         return result
+    except:
+        return False
     finally:
         if con:
             con.close()
