@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure ID Chat - Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body.home-bg {
+            background: #0f1e3d;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        .home-box {
+            background: #1c2a4b;
+            padding: 40px 30px;
+            border-radius: 12px;
+            width: 400px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            font-size: 28px;
+            color: #65a0f7;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: #c0c7d2;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            margin-bottom: 15px;
+            outline: none;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 12px 20px;
+            margin: 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            color: #fff;
+            background: #3b6cb0;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: #2b4a7d;
+        }
+
+        #status {
+            margin-top: 15px;
+            font-weight: bold;
+            color: #ff9c9c;
+        }
+
+        .toggle-link {
+            margin-top: 10px;
+            color: #65a0f7;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body class="home-bg">
+
+<div class="home-box">
+    <h1>Secure ID Chat</h1>
+
+    <!-- Registration Form -->
+    <div id="registerForm">
+        <p>Create your account</p>
+        <input id="regUsername" placeholder="Enter unique Username">
+        <input id="regEmail" placeholder="Enter Email">
+        <input id="regPassword" placeholder="Enter Password" type="password">
+        <button onclick="register()">Register</button>
+        <p class="toggle-link" onclick="showLogin()">Already registered? Login here</p>
+    </div>
+
+    <!-- Login Form -->
+    <div id="loginForm" style="display:none;">
+        <p>Login to your account</p>
+        <input id="loginEmail" placeholder="Enter Email">
+        <input id="loginPassword" placeholder="Enter Password" type="password">
+        <button onclick="login()">Login</button>
+        <p class="toggle-link" onclick="showRegister()">New user? Register here</p>
+    </div>
+
+    <p id="status"></p>
+</div>
+
+<script>
+function showLogin() {
+    document.getElementById("registerForm").style.display = "none";
+    document.getElementById("loginForm").style.display = "block";
+    document.getElementById("status").textContent = "";
+}
+
+function showRegister() {
+    document.getElementById("registerForm").style.display = "block";
+    document.getElementById("loginForm").style.display = "none";
+    document.getElementById("status").textContent = "";
+}
+
+// Registration
+async function register() {
+    const id = 'id_' + Date.now(); // Auto-generate unique ID
+    const username = document.getElementById("regUsername").value.trim();
+    const email = document.getElementById("regEmail").value.trim();
+    const password = document.getElementById("regPassword").value.trim();
+    const status = document.getElementById("status");
+
+    if(!username || !email || !password){
+        status.textContent = "Please fill all fields!";
+        return;
+    }
+
+    const r = await fetch("/register", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({id, username, email, password})
+    });
+
+    const data = await r.json();
+
+    if(r.ok){
+        alert(`Registered successfully!`);
+        window.location.href = "/chat";
+    } else {
+        status.textContent = data.error;
+    }
+}
+
+// Login
+async function login() {
+    const email = document.getElementById("loginEmail").value.trim();
+    const password = document.getElementById("loginPassword").value.trim();
+    const status = document.getElementById("status");
+
+    if(!email || !password){
+        status.textContent = "Please fill all fields!";
+        return;
+    }
+
+    const r = await fetch("/login", {
+        method: "POST",
+        headers: {"Content-Type":"application/json"},
+        body: JSON.stringify({email, password})
+    });
+
+    const data = await r.json();
+
+    if(r.ok){
+        window.location.href = "/chat";
+    } else {
+        status.textContent = data.error;
+    }
+}
+</script>
+
+</body>
+</html>

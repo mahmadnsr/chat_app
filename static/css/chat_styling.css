@@ -1,0 +1,300 @@
+/* ================= MODERN RESET & VARIABLES ================= */
+:root {
+    --bg-dark: #081121;
+    --panel-bg: #0d1b2e; 
+    --card-bg: rgba(255, 255, 255, 0.03);
+    --accent-blue: #0084ff;
+    --text-main: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.5);
+    --glass-border: rgba(255, 255, 255, 0.08); 
+    --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg-dark);
+    color: var(--text-main);
+    height: 100vh;
+    overflow: hidden;
+}
+/* User Info and Last Message Logic */
+.user-info {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* Bahar nikalne wale text ko rokne ke liye */
+    flex: 1;
+}
+
+.user-info strong {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-main);
+    display: block;
+    margin-bottom: 2px;
+}
+
+/* Yahan hai teen dots wala magic */
+.user-info small {
+    color: var(--text-dim);
+    font-size: 12.5px;
+    white-space: nowrap;      /* Text ko next line pe jane se rokega */
+    overflow: hidden;         /* Extra text ko hide karega */
+    text-overflow: ellipsis;  /* End mein '...' laga dega */
+    display: block;           /* width apply karne ke liye */
+    max-width: 200px;         /* Aap ise apne layout ke hisab se adjust kar sakte hain */
+}
+
+.left-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.user-list {
+    flex: 1;
+    overflow-y: auto; /* Scroll sirf yahan hoga */
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding-top: 5px;
+}
+
+/* ================= TOP BAR ================= */
+.top-bar {
+    height: 65px;
+    background: #0f2f5a;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 25px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+.top-bar h2 {
+    font-size: 20px;
+    font-weight: 700;
+    /* 1. Background gradient set karein */
+    background: linear-gradient(to right, #ffffff, #a5c9ff);
+    
+    /* 2. Background ko text ke shape mein clip karein */
+    -webkit-background-clip: text;
+    background-clip: text; /* Standard property */
+    
+    /* 3. Text ka color transparent karein (YE MISSING THA) */
+    color: transparent;
+    -webkit-text-fill-color: transparent; /* Safari compatibility */
+    
+    display: inline-block; /* Kabhi-kabhi layout ke liye zaroori hota hai */
+}
+
+.logout-btn {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    padding: 8px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.logout-btn:hover { background: #ff4757; border-color: #ff4757; }
+
+/* ================= LEFT PANEL ================= */
+.left-panel {
+    width: 350px;
+    background: var(--panel-bg);
+    padding: 15px;
+    overflow-y: auto;
+    border-right: 1px solid var(--glass-border);
+}
+
+.search-box { position: relative; margin-bottom: 20px; }
+
+.search-box input {
+    width: 100%;
+    padding: 12px 45px 12px 15px; 
+    border-radius: 12px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+    outline: none;
+}
+
+.search-icon-inside {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 10; /* Isse icon click-able ban jayega */
+    font-size: 18px;
+    padding: 5px; /* Click area badhane ke liye */
+}
+
+.user-list { display: flex; flex-direction: column; gap: 10px; }
+
+.user-item {
+    padding: 14px 18px;
+    background: var(--card-bg);
+    border-radius: 14px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid var(--glass-border);
+    transition: var(--transition);
+}
+
+.user-item:hover { background: rgba(255, 255, 255, 0.07); transform: translateY(-2px); }
+
+/* ================= RIGHT PANEL & HEADER ================= */
+.right-panel { flex: 1; display: none; flex-direction: column; background: var(--bg-dark); }
+.right-panel.active { display: flex; }
+
+.chat-header {
+    height: 65px;
+    background: rgba(15, 47, 90, 0.85);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* Fix: Completely Transparent Icons */
+.back-btn, .menu-btn {
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
+    font-size: 22px;
+    cursor: pointer;
+    padding: 5px;
+    outline: none;
+}
+
+/* ================= DELETE CHAT MENU (FIXED) ================= */
+.menu { position: relative; }
+
+.menu-box {
+    display: none;
+    position: absolute;
+    top: 45px;
+    right: 0;
+    background: #1e3b6f;
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.menu-box button {
+    background: transparent !important;
+    border: none !important;
+    color: white !important;
+    padding: 12px 20px;
+    width: 150px;
+    text-align: left;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.menu-box button:hover { background: rgba(255, 71, 87, 0.2) !important; color: #ff4757 !important; }
+
+/* ================= CHAT BOX ================= */
+.chat-box { flex: 1; padding: 25px; overflow-y: auto; display: flex; flex-direction: column; gap: 15px; }
+
+/* ================= UPDATED BUBBLES (Fixed Overflow) ================= */
+.bubble {
+    max-width: 75%;
+    padding: 12px 16px;
+    font-size: 18.5px;
+    font-weight: 550;
+    line-height: 1.5;
+    border-radius: 18px;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+
+    /* 🔥 BETTER WORD SPACING */
+    word-spacing: 0.15em;   /* words ke beech halka gap */
+    letter-spacing: 0.05em; /* optional: letters ko thoda breathable */
+
+    /* overflow fixes */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    word-break: break-word;
+    white-space: pre-wrap;
+}
+
+
+.sent {
+    align-self: flex-end;
+    background: linear-gradient(135deg, #0084ff, #0056b3);
+    color: #fff;
+    border-bottom-right-radius: 4px;
+    margin-left: 20%;            /* Left side se thodi jagah chhodne ke liye */
+}
+
+.received {
+    align-self: flex-start;
+    background: #1e2d41;
+    border: 1px solid var(--glass-border);
+    color: #fff;
+    border-bottom-left-radius: 4px;
+    margin-right: 20%;           /* Right side se thodi jagah chhodne ke liye */
+}
+/* ================= SEND ROW & EMOJI (FIXED) ================= */
+.send-row {
+    padding: 15px 25px;
+    background: #0d1b2e;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-top: 1px solid var(--glass-border);
+    position: relative;
+}
+
+.emoji-btn { font-size: 22px; cursor: pointer; transition: 0.2s; }
+.emoji-btn:hover { transform: scale(1.2); }
+
+.send-row input {
+    flex: 1; padding: 12px 18px; border-radius: 25px;
+    border: 1px solid var(--glass-border);
+    background: rgba(0,0,0,0.2); color: #fff; outline: none;
+}
+
+.send-btn {
+    width: 45px; height: 45px; background: var(--accent-blue);
+    border: none; border-radius: 50%; color: white; cursor: pointer;
+}
+
+/* Emoji Panel Floating Fix */
+.emoji-panel {
+    position: absolute;
+    bottom: 80px; 
+    left: 20px;
+    background: #0f2f5a;
+    padding: 12px;
+    border-radius: 15px;
+    display: flex;
+    gap: 12px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.4);
+    z-index: 1000;
+}
+
+.emoji-panel span { font-size: 24px; cursor: pointer; }
+.hidden { display: none !important; }
+
+/* ================= MOBILE ================= */
+@media(max-width: 768px) {
+    .left-panel { width: 100%; }
+    .right-panel { position: fixed; inset: 0; z-index: 100; }
+}

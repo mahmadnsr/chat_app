@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Secure ID Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chat_styling.css') }}">
+</head>
+<body>
+
+<div class="chat-app">
+    <div class="top-bar">
+        <h2>Secure ID</h2>
+        <button class="logout-btn" onclick="logout()">Logout</button>
+    </div>
+
+    <div class="chat-container">
+        <div class="left-panel" id="leftPanel">
+            <div class="search-box">
+    <input id="searchUser"
+           placeholder="Search or start new chat"
+           oninput="if(this.value==='') loadConversations()"
+           onkeydown="if(event.key==='Enter') searchUser()">
+    <span class="search-icon-inside" onclick="searchUser()">🔍</span>
+</div>
+            <div id="userList" class="user-list"></div>
+        </div>
+
+        <div class="right-panel" id="rightPanel">
+            <div class="chat-header">
+                <button class="back-btn" onclick="goBack()">←</button>
+                <span id="chatUser" data-me="{{ user }}">User</span>
+
+                <div class="menu">
+                    <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+                    <div class="menu-box" id="menuBox" style="display: none;">
+                        <button onclick="deleteConversation()">Delete chat</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="chatBox" class="chat-box"></div>
+
+            <div class="send-row" id="sendRow">
+                <span class="emoji-btn" onclick="toggleEmoji()">😊</span>
+                <input id="messageInput" 
+                       placeholder="Type a message..."
+                       onkeydown="if(event.key==='Enter') sendMessage()">
+                <button class="send-btn" onclick="sendMessage()">➤</button>
+            </div>
+
+            <div class="emoji-panel hidden" id="emojiPanel">
+                <span onclick="addEmoji('😊')">😊</span>
+                <span onclick="addEmoji('😂')">😂</span>
+                <span onclick="addEmoji('😍')">😍</span>
+                <span onclick="addEmoji('😭')">😭</span>
+                <span onclick="addEmoji('🔥')">🔥</span>
+                <span onclick="addEmoji('❤️')">❤️</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/chat.js') }}"></script>
+
+</body>
+</html>
