@@ -1,2 +1,4 @@
 flask
 cryptography
+psycopg2-binary
+werkzeug

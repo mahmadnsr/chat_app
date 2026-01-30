@@ -1,22 +1,14 @@
+import os
 from cryptography.fernet import Fernet
 
+# Vercel Environment Variable se key uthana
+# Agar key nahi milti toh default generate hogi (testing ke liye)
+ENCRYPTION_KEY = os.getenv('ENCRYPTION_KEY', Fernet.generate_key().decode())
 
-# Each user generates and stores this locally
+def encrypt_message(message: str) -> bytes:
+    f = Fernet(ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY)
+    return f.encrypt(message.encode())
 
-
-def generate_key():
-  return Fernet.generate_key()
-
-
-
-
-def encrypt_message(key: bytes, message: str) -> bytes:
-  f = Fernet(key)
-  return f.encrypt(message.encode())
-
-
-
-
-def decrypt_message(key: bytes, token: bytes) -> str:
-  f = Fernet(key)
-  return f.decrypt(token).decode()
+def decrypt_message(token: bytes) -> str:
+    f = Fernet(ENCRYPTION_KEY.encode() if isinstance(ENCRYPTION_KEY, str) else ENCRYPTION_KEY)
+    return f.decrypt(token).decode()
